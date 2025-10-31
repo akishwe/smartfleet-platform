@@ -5,11 +5,117 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  DRIVER
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum TripStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  password    String
+  role        UserRole   @default(DRIVER)
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  trips       Trip[]     @relation("UserTrips")
+}
+
+model Vehicle {
+  id                   Int              @id @default(autoincrement())
+  registration_number  String           @unique
+  model                String
+  type                 String
+  capacity             Int?
+  status               VehicleStatus    @default(AVAILABLE)
+  created_at           DateTime         @default(now())
+  updated_at           DateTime         @updatedAt
+  driver_id            Int?             @unique
+  driver               Driver?          @relation(fields: [driver_id], references: [id])
+  trips                Trip[]
+  maintenances         Maintenance[]
+  fuel_logs            FuelLog[]
+  locations            Location[]
+}
+
+model Driver {
+  id                Int        @id @default(autoincrement())
+  name              String
+  license_number    String     @unique
+  phone             String?
+  assigned_vehicle  Vehicle?
+  trips             Trip[]
+}
+
+model Trip {
+  id               Int          @id @default(autoincrement())
+  vehicle_id       Int
+  driver_id        Int
+  user_id          Int?
+  start_location   String
+  end_location     String
+  start_time       DateTime
+  end_time         DateTime?
+  status           TripStatus   @default(SCHEDULED)
+  created_at       DateTime     @default(now())
+  vehicle          Vehicle      @relation(fields: [vehicle_id], references: [id])
+  driver           Driver       @relation(fields: [driver_id], references: [id])
+  user             User?        @relation("UserTrips", fields: [user_id], references: [id])
+  locations        Location[]
+  fuel_logs        FuelLog[]
+}
+
+model Maintenance {
+  id            Int       @id @default(autoincrement())
+  vehicle_id    Int
+  service_date  DateTime
+  details       String
+  cost          Float?
+  vehicle       Vehicle   @relation(fields: [vehicle_id], references: [id])
+}
+
+model Location {
+  id           Int       @id @default(autoincrement())
+  vehicle_id   Int
+  trip_id      Int
+  latitude     Float
+  longitude    Float
+  timestamp    DateTime  @default(now())
+  vehicle      Vehicle   @relation(fields: [vehicle_id], references: [id])
+  trip         Trip      @relation(fields: [trip_id], references: [id])
+}
+
+model FuelLog {
+  id           Int       @id @default(autoincrement())
+  vehicle_id   Int
+  trip_id      Int?
+  fuel_date    DateTime  @default(now())
+  quantity     Float
+  cost         Float
+  remarks      String?
+  vehicle      Vehicle   @relation(fields: [vehicle_id], references: [id])
+  trip         Trip?     @relation(fields: [trip_id], references: [id])
 }
