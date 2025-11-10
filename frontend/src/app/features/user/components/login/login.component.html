@@ -1,0 +1,49 @@
+<div class="login-container">
+  <div class="login-card">
+    <!-- LEFT SIDE : FORM -->
+    <div class="left-section">
+      <img src="logo.png" class="logo" alt="Company Logo" />
+
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Log in to continue your dashboard</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            [class.error]="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            [class.error]="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+          />
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid">Login</button>
+      </form>
+    </div>
+
+    <!-- RIGHT SIDE : IMAGE BACKGROUND -->
+    <div class="right-section">
+      <div class="image-wrapper">
+        <img src="login-bg.png" alt="Logistics Illustration" />
+      </div>
+    </div>
+  </div>
+</div>
