@@ -1,1 +1,103 @@
-<p>register works!</p>
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-form">
+      <div class="login-form__header">
+        <img src="/logo.png" class="login-form__logo" alt="SmartFleet Logo" />
+        <h2>Create Account</h2>
+        <p class="login-form__subtitle">
+          Join SmartFleet to start managing your logistics
+        </p>
+      </div>
+
+      <form
+        [formGroup]="registerForm"
+        (ngSubmit)="onSubmit()"
+        class="login-form__body"
+      >
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="Enter your full name"
+            aria-required="true"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="Enter your email"
+            aria-required="true"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contactNumber">Contact Number</label>
+          <input
+            type="tel"
+            id="contactNumber"
+            formControlName="contactNumber"
+            placeholder="e.g., +91 98765 43210"
+            aria-required="true"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            placeholder="Create a strong password"
+            aria-required="true"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="Re-enter your password"
+            aria-required="true"
+          />
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="registerForm.invalid"
+          class="btn btn--primary"
+        >
+          Register
+        </button>
+      </form>
+
+      <div class="login-form__register">
+        <p>Already have an account?</p>
+        <a
+          routerLink="/login"
+          class="login-form__register-link"
+          aria-label="Go to login page"
+        >
+          Login
+        </a>
+      </div>
+    </div>
+
+    <div class="login-visual">
+      <div class="login-visual__wrapper">
+        <img
+          src="/register-bg.png"
+          alt="Registration Illustration"
+          class="login-visual__image"
+        />
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE `user` ADD COLUMN `contactNumber` VARCHAR(191) NOT NULL;
+ALTER TABLE `User` ADD COLUMN `contactNumber` VARCHAR(191) NOT NULL DEFAULT '' AFTER `email`;
