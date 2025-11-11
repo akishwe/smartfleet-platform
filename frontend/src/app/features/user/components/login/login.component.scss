@@ -1,145 +1,201 @@
-$primary: #0a4a55;
-$bg: #f5f7fa;
-$error: #e74c3c;
+@import "_variables.scss";
 
-.login-container {
+.login-page {
   width: 100%;
-  height: 100vh;
-  background: $bg;
+  min-height: 100vh;
+  overflow: hidden;
+  background: $bg-color;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: $space-md;
+  font-family: $font-stack;
 }
 
 .login-card {
-  width: 850px;
-  height: 520px;
-  background: white;
+  width: 900px;
+  max-height: 95vh;
+  height: auto;
+  background: $white;
   display: flex;
-  border-radius: 20px;
+  border-radius: $radius-lg;
   overflow: hidden;
-  box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.12);
+  box-shadow: 0px 15px 45px rgba(0, 0, 0, 0.1);
 }
 
-/* LEFT SECTION */
-.left-section {
+.login-form {
   width: 50%;
-  padding: 40px;
+  padding: $space-xl $space-xxl;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  .logo {
-    width: 70px;
-    margin-bottom: 25px;
+  &__logo {
+    width: 60px;
+    margin-bottom: $space-lg;
+    display: block;
   }
 
-  h2 {
-    font-size: 30px;
+  &__header h2 {
+    font-size: 2.2rem;
     font-weight: 700;
-    margin-bottom: 8px;
-    color: $primary;
+    margin-bottom: $space-sm;
+    color: $primary-color;
   }
 
-  .subtitle {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 35px;
+  &__subtitle {
+    font-size: $font-size-base;
+    color: $text-light;
+    margin-bottom: $space-xxl;
   }
 
-  form {
-    .form-group {
-      margin-bottom: 22px;
+  .form-group {
+    margin-bottom: $space-lg;
 
-      label {
-        font-size: 14px;
-        font-weight: 600;
-      }
-
-      input {
-        width: 100%;
-        padding: 12px 14px;
-        border-radius: 10px;
-        border: 1px solid #cfcfcf;
-        margin-top: 6px;
-        transition: 0.2s;
-
-        &.error {
-          border-color: $error;
-        }
-
-        &:focus {
-          border-color: $primary;
-          outline: none;
-          box-shadow: 0 0 5px rgba($primary, 0.3);
-        }
-      }
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $text-color;
+      display: block;
+      margin-bottom: $space-sm;
     }
 
-    button {
+    input {
       width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 10px;
-      background: $primary;
-      color: white;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: 0.25s;
+      padding: 14px $space-md;
+      border-radius: $radius-sm;
+      border: 1px solid #e0e0e0;
+      transition: all 0.2s ease-in-out;
+      font-size: $font-size-base;
+
+      &:focus {
+        border-color: $primary-color;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+      }
+      &.ng-invalid.ng-touched {
+        border-color: $error-color;
+      }
+    }
+  }
+
+  &__utility {
+    text-align: right;
+    margin-top: -$space-sm;
+    margin-bottom: $space-md;
+  }
+
+  &__forgot-link {
+    font-size: 0.9rem;
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+
+    &--primary {
+      background: $primary-color;
+      color: $white;
 
       &:disabled {
-        background: #8bb4ba;
+        background: $disabled-color;
         cursor: not-allowed;
+        opacity: 0.8;
       }
 
       &:hover:not(:disabled) {
-        background: darken($primary, 10%);
+        background: darken($primary-color, 8%);
       }
     }
   }
-}
 
-/* RIGHT SECTION */
-.right-section {
-  width: 50%;
-  background: $primary;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  &__register {
+    margin-top: $space-xl;
+    text-align: center;
+    p {
+      display: inline;
+      font-size: 0.9rem;
+      color: $text-light;
+      margin-right: $space-xs;
+    }
+  }
 
-  .image-wrapper {
-    width: 85%;
-    background: white;
-    padding: 25px;
-    border-radius: 18px;
-    display: flex;
-    justify-content: center;
-    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.2);
+  &__register-link {
+    color: $primary-color;
+    font-weight: 600;
+    text-decoration: none;
 
-    img {
-      width: 100%;
-      object-fit: contain;
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
+.login-visual {
+  width: 50%;
+  background: $primary-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $space-xl;
+  position: relative;
+
+  &__wrapper {
+    width: 90%;
+    background: $white;
+    padding: $space-xl;
+    border-radius: $radius-md;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+  }
+
+  &__image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
   .login-card {
     flex-direction: column;
-    width: 95%;
+    width: 98%;
+    max-width: 400px;
     height: auto;
   }
 
-  .right-section {
-    padding: 30px;
+  .login-form {
+    width: 100%;
+    padding: $space-lg;
 
-    .image-wrapper {
-      width: 70%;
+    &__header h2 {
+      font-size: 1.8rem;
+    }
+  }
+
+  .login-visual {
+    width: 100%;
+    padding: $space-lg;
+    border-radius: 0 0 $radius-lg $radius-lg;
+
+    &__wrapper {
+      width: 80%;
+      padding: $space-md;
     }
   }
 }
