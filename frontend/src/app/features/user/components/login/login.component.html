@@ -1,12 +1,10 @@
 <div class="login-page">
-  <mat-card class="login-card">
+  <div class="login-card">
     <div class="login-form">
       <div class="login-form__header">
         <img src="/logo.png" class="login-form__logo" alt="SmartFleet Logo" />
-        <h2 class="mat-h1">Welcome Back</h2>
-        <p class="mat-body-1 login-form__subtitle">
-          Log in to continue to your dashboard
-        </p>
+        <h2>Welcome Back</h2>
+        <p class="login-form__subtitle">Log in to continue to your dashboard</p>
       </div>
 
       <form
@@ -14,48 +12,32 @@
         (ngSubmit)="onSubmit()"
         class="login-form__body"
       >
-        <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
+        <div class="form-group">
+          <label for="email">Email</label>
           <input
-            matInput
             type="email"
             id="email"
             formControlName="email"
             placeholder="Enter your email"
             aria-required="true"
-            required
           />
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Password</mat-label>
+        <div class="form-group">
+          <label for="password">Password</label>
           <input
-            matInput
             type="password"
             id="password"
             formControlName="password"
             placeholder="Enter your password"
             aria-required="true"
-            required
           />
-        </mat-form-field>
-
-        <div class="login-form__utility">
-          <a
-            routerLink="/forgot-password"
-            class="login-form__forgot-link"
-            aria-label="Forgot your password?"
-          >
-            Forgot Password?
-          </a>
         </div>
 
         <button
-          mat-raised-button
-          color="primary"
           type="submit"
           [disabled]="loginForm.invalid"
-          class="full-width-btn"
+          class="btn btn--primary"
         >
           Login
         </button>
@@ -64,9 +46,8 @@
       <div class="login-form__register">
         <p>Don't have an account?</p>
         <a
+          class="btn btn--primary login-form__register-link"
           routerLink="/register"
-          class="login-form__register-link"
-          aria-label="Go to registration page"
         >
           Register
         </a>
@@ -82,5 +63,5 @@
         />
       </div>
     </div>
-  </mat-card>
+  </div>
 </div>

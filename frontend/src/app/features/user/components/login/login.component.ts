@@ -6,11 +6,12 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -18,14 +19,12 @@ export class LoginComponent {
   loginForm: FormGroup;
 
   constructor(private fb: FormBuilder) {
-    // ✅ initialize form here
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]],
     });
   }
 
-  // ✅ must exist because template uses it
   onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
