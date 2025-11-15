@@ -1,11 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 // -------------------------------------------------------------------
@@ -13,119 +13,159 @@ datasource db {
 // -------------------------------------------------------------------
 
 enum Gender {
-  M
-  F
-  O
+    M
+    F
+    O
 }
 
 enum UnitPreference {
-  METRIC
-  IMPERIAL
+    METRIC
+    IMPERIAL
 }
 
 enum VehicleStatus {
-  AVAILABLE
-  IN_TRANSIT
-  MAINTENANCE
-  INACTIVE
+    AVAILABLE
+    IN_TRANSIT
+    MAINTENANCE
+    INACTIVE
 }
 
 enum TripStatus {
-  SCHEDULED
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
+    SCHEDULED
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
 }
 
 enum VehicleTypeEnum {
-  CAR
-  VAN
-  TRUCK
-  BUS
-  MOTORCYCLE
-  OTHER
+    CAR
+    VAN
+    TRUCK
+    BUS
+    MOTORCYCLE
+    OTHER
 }
 
+enum GeofenceType {
+    WAREHOUSE
+    CUSTOMER
+    RESTRICTED
+    DELIVERY_ZONE
+}
+
+enum DriverStatus {
+    ACTIVE
+    INACTIVE
+    SUSPENDED
+}
+
+enum IntervalType {
+    KM
+    DAYS
+}
+
+enum MaintenanceStatus {
+    ACTIVE
+    COMPLETED
+}
+
+enum DocumentType {
+  RC_BOOK
+  INSURANCE
+  PUC
+  PERMIT
+  FITNESS
+  ROAD_TAX
+  OTHER
+}
 // -------------------------------------------------------------------
 // IDENTITY & ORGANIZATION (Multi-Tenancy)
 // -------------------------------------------------------------------
 
 model Organization {
-  id           BigInt    @id @default(autoincrement())
-  name         String
-  users        User[]
-  drivers      Driver[]
-  vehicles     Vehicle[]
-  geofences    Geofence[]
-
-  @@map("organizations")
+    id BigInt @id @default(autoincrement())
+    name String
+    drivers Driver[]
+    vehicles Vehicle[]
+    geofences Geofence[]
+    userOrganizations UserOrganization[]
+     userRoles   UserRole[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("organizations")
 }
 
 // APPLICATION USERS (Managers, Admins)
 model User {
-  id                      BigInt                    @id @default(autoincrement())
-
-  organizationId          BigInt
-  organization            Organization              @relation(fields: [organizationId], references: [id])
-
-  firstName               String                    @map("first_name")
-  lastName                String                    @map("last_name")
-  email                   String                    @unique
-  password            String                    @map("password")
-  contactNumber           String?                   @map("contact_number")
-
-  timezone                String?
-  preferredUnits          UnitPreference            @map("preferred_units") @default(METRIC)
-
-  roles                   UserRole[]
-  preferences             UserDashboardPreference?
-  recordedFuelLogs        FuelLog[]                 @relation("RecordedByFuelLogs")
-  recordedMaintenanceLogs MaintenanceLog[]          @relation("RecordedByMaintenanceLogs")
-  auditLogs               AuditLog[]
-
-  createdAt               DateTime                  @default(now()) @map("created_at")
-  updatedAt               DateTime                  @updatedAt @map("updated_at")
-
-  @@map("users")
+    id BigInt @id @default(autoincrement())
+    firstName String @map("first_name")
+    lastName String @map("last_name")
+    email String @unique
+    password String @map("password")
+    contactNumber String? @map("contact_number")
+    timezone String?
+    preferredUnits UnitPreference @map("preferred_units") @default(METRIC)
+    roles UserRole[]
+    preferences UserDashboardPreference?
+    recordedFuelLogs FuelLog[] @relation("RecordedByFuelLogs")
+    recordedMaintenanceLogs MaintenanceLog[] @relation("RecordedByMaintenanceLogs")
+    auditLogs AuditLog[]
+    userOrganizations UserOrganization[]
+    vehicleDocuments  VehicleDocument[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("users")
 }
 
 model Role {
-  id           BigInt           @id @default(autoincrement())
-  name         String           @unique
-  users        UserRole[]
-  permissions  RolePermission[]
+    id BigInt @id @default(autoincrement())
+    name String @unique
+    users UserRole[]
+    permissions RolePermission[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("roles")
+}
 
-  @@map("roles")
+model UserOrganization {
+    userId BigInt
+    organizationId BigInt
+    user User @relation(fields: [userId], references: [id])
+    organization Organization @relation(fields: [organizationId], references: [id])
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@id([userId, organizationId])
 }
 
 model UserRole {
-  userId BigInt
-  roleId BigInt
-  user   User   @relation(fields: [userId], references: [id])
-  role   Role   @relation(fields: [roleId], references: [id])
-
-  @@id([userId, roleId])
-  @@map("user_roles")
+    userId BigInt
+    roleId BigInt
+    organizationId BigInt
+    user User @relation(fields: [userId], references: [id])
+    role Role @relation(fields: [roleId], references: [id])
+    organization Organization @relation(fields: [organizationId], references: [id])
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@id([userId, roleId, organizationId])
 }
 
 model Permission {
-  id          BigInt           @id @default(autoincrement())
-  name        String           @unique
-  description String?
-
-  roles       RolePermission[]
-
-  @@map("permissions")
+    id BigInt @id @default(autoincrement())
+    name String @unique
+    description String?
+    roles RolePermission[]
+    @@map("permissions")
 }
 
 model RolePermission {
-  roleId       BigInt
-  permissionId BigInt
-  role         Role       @relation(fields: [roleId], references: [id])
-  permission   Permission @relation(fields: [permissionId], references: [id])
-
-  @@id([roleId, permissionId])
-  @@map("role_permissions")
+    roleId BigInt
+    permissionId BigInt
+    role Role @relation(fields: [roleId], references: [id])
+    permission Permission @relation(fields: [permissionId], references: [id])
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@id([roleId, permissionId])
+    @@map("role_permissions")
 }
 
 
@@ -134,63 +174,61 @@ model RolePermission {
 // -------------------------------------------------------------------
 
 model Driver {
-  id             BigInt          @id @default(autoincrement())
-
-  organizationId BigInt
-  organization   Organization    @relation(fields: [organizationId], references: [id])
-
-  firstName      String          @map("first_name")
-  lastName       String          @map("last_name")
-
-  licenseNumber  String          @unique @map("license_number")
-  phone          String?
-  email          String?         @unique
-
-  dateOfBirth    DateTime?       @map("date_of_birth")
-  gender         Gender?
-  status         String          @default("ACTIVE")
-
-  certifications Json?
-
-  currentVehicle Vehicle?
-  trips          Trip[]
-  scores         DriverScore[]
-  documents      DriverDocument[]
-
-  createdAt      DateTime        @default(now()) @map("created_at")
-  updatedAt      DateTime        @updatedAt @map("updated_at")
-
-  @@map("drivers")
+    id BigInt @id @default(autoincrement())
+    organizationId BigInt
+    organization Organization @relation(fields: [organizationId], references: [id])
+    firstName String @map("first_name")
+    lastName String @map("last_name")
+    licenseNumber String @unique @map("license_number")
+    phone String?
+    email String? @unique
+    dateOfBirth DateTime? @map("date_of_birth")
+    gender Gender?
+    status DriverStatus @default(ACTIVE)
+    certifications Json?
+    currentVehicle Vehicle?
+    trips Trip[]
+    scores DriverScore[]
+    documents DriverDocument[]
+    vehicleAssignments DriverVehicleAssignment[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("drivers")
 }
 
-// KPI: Stores pre-calculated daily safety scores
+model DriverVehicleAssignment {
+    driverId BigInt
+    vehicleId BigInt
+    startTime DateTime
+    endTime DateTime?
+    driver Driver @relation(fields: [driverId], references: [id])
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    @@id([driverId, vehicleId, startTime])
+}
+
 model DriverScore {
-  id          BigInt   @id @default(autoincrement())
-  driverId    BigInt
-  driver      Driver   @relation(fields: [driverId], references: [id])
-
-  scoreDate   DateTime @map("score_date")
-  safetyScore Float    @map("safety_score")
-
-  @@unique([driverId, scoreDate])
-  @@map("driver_scores")
+    id BigInt @id @default(autoincrement())
+    driverId BigInt
+    driver Driver @relation(fields: [driverId], references: [id])
+    scoreDate DateTime @map("score_date")
+    safetyScore Float @map("safety_score")
+    @@unique([driverId, scoreDate])
+    @@map("driver_scores")
 }
 
 model DriverDocument {
-  id             BigInt    @id @default(autoincrement())
-  driverId       BigInt    @map("driver_id")
-  driver         Driver    @relation(fields: [driverId], references: [id])
-  documentType   String    @map("document_type")
-  fileUrl        String    @map("file_url")
-  issueDate      DateTime? @map("issue_date")
-  expirationDate DateTime? @map("expiration_date")
-  status         String    @default("ACTIVE")
-  remarks        String?
-
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
-
-  @@map("driver_documents")
+    id BigInt @id @default(autoincrement())
+    driverId BigInt @map("driver_id")
+    driver Driver @relation(fields: [driverId], references: [id])
+    documentType String @map("document_type")
+    fileUrl String @map("file_url")
+    issueDate DateTime? @map("issue_date")
+    expirationDate DateTime? @map("expiration_date")
+    status DriverStatus @default(ACTIVE)
+    remarks String?
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("driver_documents")
 }
 
 // -------------------------------------------------------------------
@@ -198,61 +236,71 @@ model DriverDocument {
 // -------------------------------------------------------------------
 
 model Vehicle {
-  id                  BigInt          @id @default(autoincrement())
-
-  organizationId      BigInt
-  organization        Organization    @relation(fields: [organizationId], references: [id])
-
-  vin                 String          @unique
-  licensePlate        String          @unique @map("license_plate")
-  imeiNumber          String          @unique @map("imei_number")
-  gpsUnitId           String?         @unique @map("gps_unit_id")
-
-  make                String
-  model               String
-  year                Int
-  fuelType            String          @map("fuel_type")
-  capacity            Int?
-  purchaseDate        DateTime        @map("purchase_date")
-  currentOdometerKm   Int             @map("current_odometer_km")
-
-  status              VehicleStatus   @default(AVAILABLE)
-  vehicleType         VehicleTypeEnum @default(CAR) @map("vehicle_type")
-  loadCapacityKg      Float?          @map("load_capacity_kg")
-  volumeCapacityM3    Float?          @map("volume_capacity_m3")
-
-  currentDriverId     BigInt?         @unique @map("current_driver_id")
-  currentDriver       Driver?         @relation(fields: [currentDriverId], references: [id])
-
-  trips               Trip[]
-  maintenanceLogs     MaintenanceLog[]
-  maintenanceSchedules MaintenanceSchedule[]
-  fuelLogs            FuelLog[]
-  telemetryData       TelemetryData[]
-  documents           VehicleDocument[]
-  geofenceEvents      GeofenceEvent[]
-
-  createdAt           DateTime        @default(now()) @map("created_at")
-  updatedAt           DateTime        @updatedAt @map("updated_at")
-
-  @@map("vehicles")
+    id BigInt @id @default(autoincrement())
+    organizationId BigInt
+    organization Organization @relation(fields: [organizationId], references: [id])
+    vin String @unique
+    licensePlate String @unique @map("license_plate")
+    imeiNumber String @unique @map("imei_number")
+    gpsUnitId String? @unique @map("gps_unit_id")
+    make String
+    model String
+    year Int
+    fuelType String @map("fuel_type")
+    capacity Int?
+    purchaseDate DateTime @map("purchase_date")
+    currentOdometerKm Int @map("current_odometer_km")
+    status VehicleStatus @default(AVAILABLE)
+    vehicleType VehicleTypeEnum @default(CAR) @map("vehicle_type")
+    loadCapacityKg Float? @map("load_capacity_kg")
+    volumeCapacityM3 Float? @map("volume_capacity_m3")
+    currentDriverId BigInt? @unique @map("current_driver_id")
+    currentDriver Driver? @relation(fields: [currentDriverId], references: [id])
+    trips Trip[]
+    maintenanceLogs MaintenanceLog[]
+    maintenanceSchedules MaintenanceSchedule[]
+    fuelLogs FuelLog[]
+    telemetryData TelemetryData[]
+    documents VehicleDocument[]
+    geofenceEvents GeofenceEvent[]
+    device VehicleDevice[]
+    driverAssignments DriverVehicleAssignment[]
+    healthScores       VehicleHealthScore[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("vehicles")
 }
 
 model VehicleDocument {
-  id             BigInt    @id @default(autoincrement())
-  vehicleId      BigInt    @map("vehicle_id")
-  vehicle        Vehicle   @relation(fields: [vehicleId], references: [id])
-  documentType   String    @map("document_type")
-  fileUrl        String    @map("file_url")
-  issueDate      DateTime? @map("issue_date")
-  expirationDate DateTime? @map("expiration_date")
-  status         String    @default("ACTIVE")
-  remarks        String?
+  id           BigInt     @id @default(autoincrement())
+  vehicleId    BigInt
+  type         DocumentType
+  documentUrl  String
+  validFrom    DateTime?
+  validTill    DateTime?
+  uploadedBy   BigInt?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
+  vehicle      Vehicle    @relation(fields: [vehicleId], references: [id])
+  user         User?      @relation(fields: [uploadedBy], references: [id])
+}
 
-  @@map("vehicle_documents")
+model VehicleDevice {
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt
+    imei String @unique
+    firmwareVersion String?
+    lastSync DateTime?
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+}
+
+model VehicleHealthScore {
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    score Float
+    recordedAt DateTime @default(now())
 }
 
 // -------------------------------------------------------------------
@@ -260,76 +308,87 @@ model VehicleDocument {
 // -------------------------------------------------------------------
 
 model Trip {
-  id                       BigInt       @id @default(autoincrement())
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    driverId BigInt @map("driver_id")
+    driver Driver @relation(fields: [driverId], references: [id])
+    startTime DateTime @map("start_time")
+    endTime DateTime? @map("end_time")
+    startLat Float @map("start_lat")
+    startLon Float @map("start_lon")
+    endLat Float? @map("end_lat")
+    endLon Float? @map("end_lon")
+    actualDistanceKm Float @map("actual_distance_km")
+    idleDurationMin Int @map("idle_duration_min")
+    fuelConsumedLitres Float? @map("fuel_consumed_litres")
+    weatherConditions String? @map("weather_conditions")
+    plannedDistanceKm Float? @map("planned_distance_km")
+    plannedDurationMin Int? @map("planned_duration_min")
+    plannedFuelConsumptionLitres Float? @map("planned_fuel_consumption_litres")
+    routeGeometryJson Json? @map("route_geometry_json")
+    status TripStatus @default(SCHEDULED)
+    fuelLogs FuelLog[]
+    waypoints TripWaypoint[]
+    cost Float?
+    efficiency Float?
+    createdAt DateTime @default(now())
 
-  vehicleId                BigInt       @map("vehicle_id")
-  vehicle                  Vehicle      @relation(fields: [vehicleId], references: [id])
-
-  driverId                 BigInt       @map("driver_id")
-  driver                   Driver       @relation(fields: [driverId], references: [id])
-
-  startTime                DateTime     @map("start_time")
-  endTime                  DateTime?    @map("end_time")
-
-  startLat                 Float        @map("start_lat")
-  startLon                 Float        @map("start_lon")
-  endLat                   Float?       @map("end_lat")
-  endLon                   Float?       @map("end_lon")
-
-  actualDistanceKm         Float        @map("actual_distance_km")
-  idleDurationMin          Int          @map("idle_duration_min")
-  fuelConsumedLitres       Float?       @map("fuel_consumed_litres")
-  weatherConditions        String?      @map("weather_conditions")
-
-  // Planned trip metrics
-  plannedDistanceKm        Float?       @map("planned_distance_km")
-  plannedDurationMin       Int?         @map("planned_duration_min")
-  plannedFuelConsumptionLitres Float?   @map("planned_fuel_consumption_litres")
-  routeGeometryJson        Json?        @map("route_geometry_json")
-
-  status                   TripStatus   @default(SCHEDULED)
-
-  fuelLogs                 FuelLog[]
-  waypoints                TripWaypoint[]
-
-  createdAt                DateTime     @default(now())
-
-  @@map("trips")
+    @@map("trips")
 }
 
 model TripWaypoint {
-  id            BigInt    @id @default(autoincrement())
-  tripId        BigInt    @map("trip_id")
-  trip          Trip      @relation(fields: [tripId], references: [id])
-  latitude      Float
-  longitude     Float
-  sequence      Int
-  waypointType  String    @map("waypoint_type")
-  scheduledTime DateTime? @map("scheduled_time")
-  actualTime    DateTime? @map("actual_time")
-
-  @@map("trip_waypoints")
+    id BigInt @id @default(autoincrement())
+    tripId BigInt @map("trip_id")
+    trip Trip @relation(fields: [tripId], references: [id])
+    latitude Float
+    longitude Float
+    sequence Int
+    waypointType String @map("waypoint_type")
+    scheduledTime DateTime? @map("scheduled_time")
+    actualTime DateTime? @map("actual_time")
+    createdAt DateTime @default(now())
+    @@map("trip_waypoints")
 }
 
 
 // HIGH-VOLUME GPS/TELEMETRY DATA
 model TelemetryData {
-  id             BigInt   @id @default(autoincrement())
-
-  vehicleId      BigInt   @map("vehicle_id")
-  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id])
-
-  timestamp      DateTime
-  latitude       Float
-  longitude      Float
-  speed          Float?
-  fuelLevel      Float?
-  headingDegrees Float?   @map("heading_degrees")
-  engineRpm      Int?     @map("engine_rpm")
-  engineLoadPercent Float? @map("engine_load_percent")
-
-  @@index([vehicleId, timestamp])
-  @@map("telemetry_data")
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    timestamp DateTime
+    latitude Float
+    longitude Float
+    speed Float?
+    headingDegrees Float?
+    altitudeM Float?
+    gpsAccuracyM Float?
+    odometerKm Float?
+    fuelLevel Float?
+    fuelRate Float?
+    instantFuelEconomy Float?
+    averageFuelEconomy Float?
+    engineRpm Int?
+    engineLoadPercent Float?
+    coolantTempC Float?
+    batteryVoltage Float?
+    throttlePosition Float?
+    engineOilTemp Float?
+    intakeAirTemp Float?
+    mafRate Float?
+    harshAccelerationCount Int?
+    harshBrakingCount Int?
+    harshCorneringCount Int?
+    idlingDurationSec Int?
+    overSpeeding Boolean?
+    dtcCodesJson Json? @map("dtc_codes_json")
+    eventCode String?
+    eventSeverity String?
+    eventDescription String?
+    createdAt DateTime @default(now())
+    @@index([vehicleId, timestamp])
+    @@map("telemetry_data")
 }
 
 // -------------------------------------------------------------------
@@ -337,76 +396,73 @@ model TelemetryData {
 // -------------------------------------------------------------------
 
 model MaintenanceType {
-  id                 BigInt                @id @default(autoincrement())
-  name               String                @unique
-  maintenanceLogs    MaintenanceLog[]
-  schedules          MaintenanceSchedule[]
-
-  @@map("maintenance_types")
+    id BigInt @id @default(autoincrement())
+    name String @unique
+    maintenanceLogs MaintenanceLog[]
+    schedules MaintenanceSchedule[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    @@map("maintenance_types")
 }
 
 model MaintenanceLog {
-  id                  BigInt        @id @default(autoincrement())
-  vehicleId           BigInt        @map("vehicle_id")
-  vehicle             Vehicle       @relation(fields: [vehicleId], references: [id])
-  maintenanceTypeId   BigInt        @map("maintenance_type_id")
-  maintenanceType     MaintenanceType @relation(fields: [maintenanceTypeId], references: [id])
-  serviceDate         DateTime      @map("service_date")
-  odometerReading     Int           @map("odometer_reading")
-  details             String?
-  cost                Float?
-  currencyCode        String?       @map("currency_code")
-  receiptFileUrl      String?       @map("receipt_file_url")
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    maintenanceTypeId BigInt @map("maintenance_type_id")
+    maintenanceType MaintenanceType @relation(fields: [maintenanceTypeId], references: [id])
+    serviceDate DateTime @map("service_date")
+    odometerReading Int @map("odometer_reading")
+    details String?
+    cost Float?
+    currencyCode String? @map("currency_code")
+    receiptFileUrl String? @map("receipt_file_url")
+    recordedByUserId BigInt? @map("recorded_by_user_id")
+    recordedByUser User? @relation("RecordedByMaintenanceLogs", fields: [recordedByUserId], references: [id])
+    status MaintenanceStatus @default(ACTIVE)
+    createdAt DateTime @default(now())
 
-  recordedByUserId    BigInt?       @map("recorded_by_user_id")
-  recordedByUser      User?         @relation("RecordedByMaintenanceLogs", fields: [recordedByUserId], references: [id])
-
-  createdAt           DateTime      @default(now())
-
-  @@map("maintenance_logs")
+    @@map("maintenance_logs")
 }
 
 model MaintenanceSchedule {
-  id                  BigInt            @id @default(autoincrement())
-  vehicleId           BigInt            @map("vehicle_id")
-  vehicle             Vehicle           @relation(fields: [vehicleId], references: [id])
-  maintenanceTypeId   BigInt            @map("maintenance_type_id")
-  maintenanceType     MaintenanceType   @relation(fields: [maintenanceTypeId], references: [id])
-  lastServiceDate     DateTime?         @map("last_service_date")
-  lastOdometerKm      Int?              @map("last_odometer_km")
-  nextServiceDate     DateTime          @map("next_service_date")
-  nextOdometerKm      Int               @map("next_odometer_km")
-  intervalType        String            @map("interval_type")
-  intervalValue       Int               @map("interval_value")
-  status              String            @default("ACTIVE")
-
-  createdAt           DateTime          @default(now()) @map("created_at")
-  updatedAt           DateTime          @updatedAt @map("updated_at")
-
-  @@map("maintenance_schedules")
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    maintenanceTypeId BigInt @map("maintenance_type_id")
+    maintenanceType MaintenanceType @relation(fields: [maintenanceTypeId], references: [id])
+    lastServiceDate DateTime? @map("last_service_date")
+    lastOdometerKm Int? @map("last_odometer_km")
+    nextServiceDate DateTime @map("next_service_date")
+    nextOdometerKm Int @map("next_odometer_km")
+    intervalType IntervalType @map("interval_type")
+    intervalValue Int @map("interval_value")
+    status MaintenanceStatus @default(ACTIVE)
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("maintenance_schedules")
 }
 
 
 model FuelLog {
-  id           BigInt    @id @default(autoincrement())
-  vehicleId    BigInt    @map("vehicle_id")
-  vehicle      Vehicle   @relation(fields: [vehicleId], references: [id])
-  tripId       BigInt?   @map("trip_id")
-  trip         Trip?     @relation(fields: [tripId], references: [id])
-  fuelDate     DateTime  @map("fuel_date")
-  quantity     Float
-  cost         Float
-  currencyCode String?   @map("currency_code")
-  location     String?
-  remarks      String?
-  receiptFileUrl String? @map("receipt_file_url")
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    tripId BigInt? @map("trip_id")
+    trip Trip? @relation(fields: [tripId], references: [id])
+    fuelDate DateTime @map("fuel_date")
+    quantity Float
+    cost Float
+    currencyCode String? @map("currency_code")
+    location String?
+    remarks String?
+    receiptFileUrl String? @map("receipt_file_url")
+    anomalyFlags Json?
+    recordedByUserId BigInt? @map("recorded_by_user_id")
+    recordedByUser User? @relation("RecordedByFuelLogs", fields: [recordedByUserId], references: [id])
+    createdAt DateTime @default(now())
 
-  recordedByUserId BigInt? @map("recorded_by_user_id")
-  recordedByUser   User?   @relation("RecordedByFuelLogs", fields: [recordedByUserId], references: [id])
-
-  createdAt    DateTime  @default(now())
-
-  @@map("fuel_logs")
+    @@map("fuel_logs")
 }
 
 // -------------------------------------------------------------------
@@ -414,61 +470,72 @@ model FuelLog {
 // -------------------------------------------------------------------
 
 model Geofence {
-  id             BigInt     @id @default(autoincrement())
-  organizationId BigInt
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  name           String
-  type           String
-  coordinatesJson Json      @map("coordinates_json")
-  alertOnEnter   Boolean    @map("alert_on_enter") @default(false)
-  alertOnExit    Boolean    @map("alert_on_exit") @default(false)
-
-  events         GeofenceEvent[]
-
-  createdAt      DateTime   @default(now()) @map("created_at")
-  updatedAt      DateTime   @updatedAt @map("updated_at")
-
-  @@map("geofences")
+    id BigInt @id @default(autoincrement())
+    organizationId BigInt
+    organization Organization @relation(fields: [organizationId], references: [id])
+    name String
+    type GeofenceType
+    coordinatesJson Json @map("coordinates_json")
+    alertOnEnter Boolean @map("alert_on_enter") @default(false)
+    alertOnExit Boolean @map("alert_on_exit") @default(false)
+    events GeofenceEvent[]
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("geofences")
 }
 
 model GeofenceEvent {
-  id           BigInt    @id @default(autoincrement())
-  vehicleId    BigInt    @map("vehicle_id")
-  vehicle      Vehicle   @relation(fields: [vehicleId], references: [id])
-  geofenceId   BigInt    @map("geofence_id")
-  geofence     Geofence  @relation(fields: [geofenceId], references: [id])
-  timestamp    DateTime
-  eventType    String    @map("event_type")
-  locationLat  Float?    @map("location_lat")
-  locationLon  Float?    @map("location_lon")
-
-  @@map("geofence_events")
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt @map("vehicle_id")
+    vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    geofenceId BigInt @map("geofence_id")
+    geofence Geofence @relation(fields: [geofenceId], references: [id])
+    timestamp DateTime
+    eventType String @map("event_type")
+    locationLat Float? @map("location_lat")
+    locationLon Float? @map("location_lon")
+    createdAt DateTime @default(now())
+    @@map("geofence_events")
 }
 
 // -------------------------------------------------------------------
 // DASHBOARD & UX
 // -------------------------------------------------------------------
 model UserDashboardPreference {
-  id                BigInt @id @default(autoincrement())
-  userId            BigInt @unique
-  user              User   @relation(fields: [userId], references: [id])
-  widgetOrderJson   Json   @map("widget_order_json")
-  themePreference   String? @map("theme_preference")
-
-  @@map("user_dashboard_prefs")
+    id BigInt @id @default(autoincrement())
+    userId BigInt @unique
+    user User @relation(fields: [userId], references: [id])
+    widgetOrderJson Json @map("widget_order_json")
+    themePreference String? @map("theme_preference")
+    createdAt DateTime @default(now()) @map("created_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+    @@map("user_dashboard_prefs")
 }
 
 model AuditLog {
-  id          BigInt    @id @default(autoincrement())
-  userId      BigInt?   @map("user_id")
-  user        User?     @relation(fields: [userId], references: [id])
-  action      String
-  entityType  String?   @map("entity_type")
-  entityId    BigInt?   @map("entity_id")
-  changesJson Json?     @map("changes_json")
-  ipAddress   String?   @map("ip_address")
-  userAgent   String?   @map("user_agent")
-  timestamp   DateTime  @default(now())
+    id BigInt @id @default(autoincrement())
+    userId BigInt? @map("user_id")
+    user User? @relation(fields: [userId], references: [id])
+    action String
+    entityType String? @map("entity_type")
+    entityId BigInt? @map("entity_id")
+    changesJson Json? @map("changes_json")
+    ipAddress String? @map("ip_address")
+    userAgent String? @map("user_agent")
+    timestamp DateTime @default(now())
 
-  @@map("audit_logs")
+    @@map("audit_logs")
+}
+
+model Alert {
+    id BigInt @id @default(autoincrement())
+    vehicleId BigInt?
+    driverId BigInt?
+    type String
+    message String
+    severity String
+    timestamp DateTime @default(now())
+    read Boolean @default(false)
+
+    @@map("alerts")
 }

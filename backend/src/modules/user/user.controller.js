@@ -10,41 +10,40 @@ import userService from "./user.service.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const existingUser = await userService.findByEmail(email);
+    const { firstName, lastName, email, password, roleId } = req.body;
 
+    const existingUser = await userService.findByEmail(email);
     if (existingUser) return errorResponse(res, "User already exists", 409);
 
     const hashedPassword = await hashPassword(password);
+
     const user = await userService.createUser({
-      name,
+      firstName,
+      lastName,
       email,
       password: hashedPassword,
-      role,
+      roles: {
+        create: [{ roleId }],
+      },
     });
 
     logger.info(`New user registered: ${email}`);
-    return successResponse(res, "User registered successfully", {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
+    return successResponse(res, "User registered successfully", user);
   } catch (error) {
     logger.error("User registration failed", error);
-    return errorResponse(res, "Failed to register user", 500, error);
+    return errorResponse(res, "Failed to register user", 500, error.message);
   }
 };
 
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await userService.findByEmail(email);
 
+    const user = await userService.findByEmailWithRoles(email);
     if (!user) return errorResponse(res, "Invalid email or password", 401);
 
-    const isPasswordValid = await comparePassword(password, user.password);
-    if (!isPasswordValid)
-      return errorResponse(res, "Invalid email or password", 401);
+    const isValid = await comparePassword(password, user.password);
+    if (!isValid) return errorResponse(res, "Invalid email or password", 401);
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
@@ -56,7 +55,7 @@ export const loginUser = async (req, res) => {
     return successResponse(res, "Login successful", { accessToken });
   } catch (error) {
     logger.error("Login failed", error);
-    return errorResponse(res, "Login failed", 500, error);
+    return errorResponse(res, "Login failed", 500, error.message);
   }
 };
 
@@ -65,15 +64,9 @@ export const getProfile = async (req, res) => {
     const user = await userService.findById(req.user.id);
     if (!user) return errorResponse(res, "User not found", 404);
 
-    logger.info(`Profile fetched for user: ${req.user.email}`);
-    return successResponse(res, "Profile fetched successfully", {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    });
+    return successResponse(res, "Profile fetched successfully", user);
   } catch (error) {
     logger.error("Fetching profile failed", error);
-    return errorResponse(res, "Failed to fetch user profile", 500, error);
+    return errorResponse(res, "Failed to fetch profile", 500, error.message);
   }
 };

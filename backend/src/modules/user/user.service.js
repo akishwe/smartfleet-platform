@@ -7,25 +7,53 @@ const findByEmail = async (email) => {
       where: { email },
     });
   } catch (error) {
-    logger.error(`Database error while finding user by email: ${email}`, error);
-    throw new Error("Database query failed");
+    logger.error("Error finding user by email:", error);
+    throw error;
   }
 };
 
-const createUser = async (userData) => {
+const findByEmailWithRoles = async (email) => {
   try {
-    return await prisma.user.create({
-      data: userData,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
+    return await prisma.user.findUnique({
+      where: { email },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
       },
     });
   } catch (error) {
-    logger.error("Database error while creating user", error);
-    throw new Error("Failed to create user");
+    logger.error("Error finding user with roles:", error);
+    throw error;
+  }
+};
+
+const createUser = async (data) => {
+  try {
+    return await prisma.user.create({
+      data,
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  } catch (error) {
+    logger.error("Error creating user:", error);
+    throw error;
   }
 };
 
@@ -35,15 +63,27 @@ const findById = async (id) => {
       where: { id },
       select: {
         id: true,
-        name: true,
+        firstName: true,
+        lastName: true,
         email: true,
-        role: true,
+        roles: {
+          select: {
+            role: {
+              select: { id: true, name: true },
+            },
+          },
+        },
       },
     });
   } catch (error) {
-    logger.error(`Database error while finding user by ID: ${id}`, error);
-    throw new Error("Database query failed");
+    logger.error("Error fetching user by ID:", error);
+    throw error;
   }
 };
 
-export default { findByEmail, createUser, findById };
+export default {
+  findByEmail,
+  findByEmailWithRoles,
+  createUser,
+  findById,
+};
