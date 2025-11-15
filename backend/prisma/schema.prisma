@@ -37,7 +37,7 @@ enum TripStatus {
     CANCELLED
 }
 
-enum VehicleTypeEnum {
+enum VehicleType {
     CAR
     VAN
     TRUCK
@@ -78,6 +78,11 @@ enum DocumentType {
   ROAD_TAX
   OTHER
 }
+enum MfaType {
+  TOTP
+  SMS
+  EMAIL
+}
 // -------------------------------------------------------------------
 // IDENTITY & ORGANIZATION (Multi-Tenancy)
 // -------------------------------------------------------------------
@@ -97,24 +102,43 @@ model Organization {
 
 // APPLICATION USERS (Managers, Admins)
 model User {
-    id BigInt @id @default(autoincrement())
-    firstName String @map("first_name")
-    lastName String @map("last_name")
-    email String @unique
-    password String @map("password")
-    contactNumber String? @map("contact_number")
-    timezone String?
-    preferredUnits UnitPreference @map("preferred_units") @default(METRIC)
-    roles UserRole[]
-    preferences UserDashboardPreference?
-    recordedFuelLogs FuelLog[] @relation("RecordedByFuelLogs")
-    recordedMaintenanceLogs MaintenanceLog[] @relation("RecordedByMaintenanceLogs")
-    auditLogs AuditLog[]
-    userOrganizations UserOrganization[]
-    vehicleDocuments  VehicleDocument[]
-    createdAt DateTime @default(now()) @map("created_at")
-    updatedAt DateTime @updatedAt @map("updated_at")
-    @@map("users")
+  id                  BigInt      @id @default(autoincrement())
+  firstName           String       @map("first_name")
+  lastName            String       @map("last_name")
+  email               String       @unique
+  password            String       @map("password")
+  contactNumber       String?      @map("contact_number")
+  timezone            String?
+  preferredUnits      UnitPreference @map("preferred_units") @default(METRIC)
+  username            String?      @unique
+  phone               String?      @unique
+  isEmailVerified     Boolean      @default(false)
+  isPhoneVerified     Boolean      @default(false)
+  mfaEnabled          Boolean      @default(false)
+  mfaType             MfaType?
+  mfaSecret           String?
+  mfaBackupCodes      String?
+  mfaPhoneVerified    Boolean      @default(false)
+  mfaEmailVerified    Boolean      @default(false)
+  lastLoginAt         DateTime?
+  loginAttempts       Int          @default(0)
+  lockedUntil         DateTime?
+  isActive            Boolean      @default(true)
+  gender              Gender?
+  dob                 DateTime?
+  profileImageUrl     String?
+  language            String?      @default("en")
+  roles               UserRole[]
+  preferences         UserDashboardPreference?
+  recordedFuelLogs    FuelLog[]                @relation("RecordedByFuelLogs")
+  recordedMaintenanceLogs MaintenanceLog[]      @relation("RecordedByMaintenanceLogs")
+  auditLogs           AuditLog[]
+  userOrganizations   UserOrganization[]
+  vehicleDocuments    VehicleDocument[]
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt      @map("updated_at")
+
+  @@map("users")
 }
 
 model Role {
@@ -251,7 +275,7 @@ model Vehicle {
     purchaseDate DateTime @map("purchase_date")
     currentOdometerKm Int @map("current_odometer_km")
     status VehicleStatus @default(AVAILABLE)
-    vehicleType VehicleTypeEnum @default(CAR) @map("vehicle_type")
+    vehicleType VehicleType @default(CAR) @map("vehicle_type")
     loadCapacityKg Float? @map("load_capacity_kg")
     volumeCapacityM3 Float? @map("volume_capacity_m3")
     currentDriverId BigInt? @unique @map("current_driver_id")
