@@ -34,12 +34,16 @@
           />
         </div>
 
-        <button
-          type="submit"
-          [disabled]="loginForm.invalid"
-          class="btn btn--primary"
+        <div
+          *ngIf="errorMessage"
+          class="error-message"
+          style="color: #d9534f; margin-bottom: 1rem"
         >
-          Login
+          {{ errorMessage }}
+        </div>
+
+        <button type="submit" [disabled]="loading" class="btn btn--primary">
+          {{ loading ? "Logging in..." : "Login" }}
         </button>
       </form>
 

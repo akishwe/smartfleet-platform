@@ -3,9 +3,12 @@ import logger from "../../config/logger.js";
 
 const findByEmail = async (email) => {
   try {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
+
+    if (user) user.id = user.id.toString();
+    return user;
   } catch (error) {
     logger.error("Error finding user by email:", error);
     throw error;
@@ -39,7 +42,7 @@ const createUser = async (data) => {
       },
     });
 
-    user.id = user.id.toString();
+    user.id = user.id.toString(); // convert BigInt to string
     return user;
   } catch (error) {
     logger.error("Error creating user:", error);
@@ -49,8 +52,8 @@ const createUser = async (data) => {
 
 const findById = async (id) => {
   try {
-    return await prisma.user.findUnique({
-      where: { id },
+    const user = await prisma.user.findUnique({
+      where: { id: BigInt(id) }, // ensure id type matches Prisma schema
       select: {
         id: true,
         firstName: true,
@@ -63,6 +66,9 @@ const findById = async (id) => {
         language: true,
       },
     });
+
+    if (user) user.id = user.id.toString(); // convert BigInt to string
+    return user;
   } catch (error) {
     logger.error("Error fetching user by ID:", error);
     throw error;
