@@ -94,7 +94,6 @@ model Organization {
     vehicles Vehicle[]
     geofences Geofence[]
     userOrganizations UserOrganization[]
-     userRoles   UserRole[]
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
     @@map("organizations")
@@ -164,13 +163,11 @@ model UserOrganization {
 model UserRole {
     userId BigInt
     roleId BigInt
-    organizationId BigInt
     user User @relation(fields: [userId], references: [id])
     role Role @relation(fields: [roleId], references: [id])
-    organization Organization @relation(fields: [organizationId], references: [id])
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
-    @@id([userId, roleId, organizationId])
+    @@id([userId, roleId])
 }
 
 model Permission {
