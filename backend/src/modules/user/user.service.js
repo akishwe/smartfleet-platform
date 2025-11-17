@@ -12,45 +12,35 @@ const findByEmail = async (email) => {
   }
 };
 
-const findByEmailWithRoles = async (email) => {
-  try {
-    return await prisma.user.findUnique({
-      where: { email },
-      include: {
-        roles: {
-          include: {
-            role: true,
-          },
-        },
-      },
-    });
-  } catch (error) {
-    logger.error("Error finding user with roles:", error);
-    throw error;
-  }
-};
-
 const createUser = async (data) => {
   try {
-    return await prisma.user.create({
-      data,
+    const user = await prisma.user.create({
+      data: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        contactNumber: data.contactNumber,
+        timezone: data.timezone,
+        gender: data.gender,
+        dob: data.dob,
+        language: data.language,
+      },
       select: {
         id: true,
         firstName: true,
         lastName: true,
         email: true,
-        roles: {
-          select: {
-            role: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
+        contactNumber: true,
+        timezone: true,
+        gender: true,
+        dob: true,
+        language: true,
       },
     });
+
+    user.id = user.id.toString();
+    return user;
   } catch (error) {
     logger.error("Error creating user:", error);
     throw error;
@@ -66,13 +56,11 @@ const findById = async (id) => {
         firstName: true,
         lastName: true,
         email: true,
-        roles: {
-          select: {
-            role: {
-              select: { id: true, name: true },
-            },
-          },
-        },
+        contactNumber: true,
+        timezone: true,
+        gender: true,
+        dob: true,
+        language: true,
       },
     });
   } catch (error) {
@@ -83,7 +71,6 @@ const findById = async (id) => {
 
 export default {
   findByEmail,
-  findByEmailWithRoles,
   createUser,
   findById,
 };

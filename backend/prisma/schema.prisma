@@ -158,6 +158,7 @@ model UserOrganization {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
     @@id([userId, organizationId])
+    @@map("user_organizations")
 }
 
 model UserRole {
@@ -168,6 +169,7 @@ model UserRole {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
     @@id([userId, roleId])
+    @@map("user_roles")
 }
 
 model Permission {
@@ -225,6 +227,7 @@ model DriverVehicleAssignment {
     driver Driver @relation(fields: [driverId], references: [id])
     vehicle Vehicle @relation(fields: [vehicleId], references: [id])
     @@id([driverId, vehicleId, startTime])
+    @@map("driver_vehicle_assignments")
 }
 
 model DriverScore {
@@ -286,7 +289,7 @@ model Vehicle {
     geofenceEvents GeofenceEvent[]
     device VehicleDevice[]
     driverAssignments DriverVehicleAssignment[]
-    healthScores       VehicleHealthScore[]
+    healthScores VehicleHealthScore[]
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
     @@map("vehicles")
@@ -305,6 +308,7 @@ model VehicleDocument {
 
   vehicle      Vehicle    @relation(fields: [vehicleId], references: [id])
   user         User?      @relation(fields: [uploadedBy], references: [id])
+  @@map("vehicle_documents")
 }
 
 model VehicleDevice {
@@ -314,6 +318,7 @@ model VehicleDevice {
     firmwareVersion String?
     lastSync DateTime?
     vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+    @@map("vehicle_devices")
 }
 
 model VehicleHealthScore {
@@ -322,6 +327,7 @@ model VehicleHealthScore {
     vehicle Vehicle @relation(fields: [vehicleId], references: [id])
     score Float
     recordedAt DateTime @default(now())
+    @@map("vehicle_health_scores")
 }
 
 // -------------------------------------------------------------------
@@ -522,6 +528,7 @@ model GeofenceEvent {
 // -------------------------------------------------------------------
 // DASHBOARD & UX
 // -------------------------------------------------------------------
+
 model UserDashboardPreference {
     id BigInt @id @default(autoincrement())
     userId BigInt @unique
@@ -557,6 +564,6 @@ model Alert {
     severity String
     timestamp DateTime @default(now())
     read Boolean @default(false)
-
+    
     @@map("alerts")
 }

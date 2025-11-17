@@ -10,28 +10,38 @@ import userService from "./user.service.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, password, roleId } = req.body;
-
-    const existingUser = await userService.findByEmail(email);
-    if (existingUser) return errorResponse(res, "User already exists", 409);
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      contactNumber,
+      timezone,
+      gender,
+      dob,
+      language,
+    } = req.body;
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await userService.createUser({
+    const userData = {
       firstName,
       lastName,
       email,
       password: hashedPassword,
-      roles: {
-        create: [{ roleId }],
-      },
-    });
+      contactNumber,
+      timezone,
+      gender,
+      dob,
+      language,
+    };
 
-    logger.info(`New user registered: ${email}`);
-    return successResponse(res, "User registered successfully", user);
+    const user = await userService.createUser(userData);
+
+    return successResponse(res, "User registered successfully", user, 201);
   } catch (error) {
-    logger.error("User registration failed", error);
-    return errorResponse(res, "Failed to register user", 500, error.message);
+    logger.error(error);
+    return errorResponse(res, "Something went wrong", 500, error);
   }
 };
 
@@ -39,7 +49,7 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userService.findByEmailWithRoles(email);
+    const user = await userService.findByEmail(email);
     if (!user) return errorResponse(res, "Invalid email or password", 401);
 
     const isValid = await comparePassword(password, user.password);
@@ -52,10 +62,10 @@ export const loginUser = async (req, res) => {
     res.setHeader("Set-Cookie", cookie);
 
     logger.info(`User logged in: ${email}`);
-    return successResponse(res, "Login successful", { accessToken });
+    return successResponse(res, "Login successful", { accessToken }, 200);
   } catch (error) {
     logger.error("Login failed", error);
-    return errorResponse(res, "Login failed", 500, error.message);
+    return errorResponse(res, "Login failed", 500, error);
   }
 };
 
@@ -64,9 +74,9 @@ export const getProfile = async (req, res) => {
     const user = await userService.findById(req.user.id);
     if (!user) return errorResponse(res, "User not found", 404);
 
-    return successResponse(res, "Profile fetched successfully", user);
+    return successResponse(res, "Profile fetched successfully", user, 200);
   } catch (error) {
     logger.error("Fetching profile failed", error);
-    return errorResponse(res, "Failed to fetch profile", 500, error.message);
+    return errorResponse(res, "Failed to fetch profile", 500, error);
   }
 };
