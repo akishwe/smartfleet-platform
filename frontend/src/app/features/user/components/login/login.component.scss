@@ -1,0 +1,201 @@
+@import "_variables.scss";
+
+.login-page {
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: $bg-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $space-md;
+  font-family: $font-stack;
+}
+
+.login-card {
+  width: 900px;
+  max-height: 95vh;
+  height: auto;
+  background: $white;
+  display: flex;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: 0px 15px 45px rgba(0, 0, 0, 0.1);
+}
+
+.login-form {
+  width: 50%;
+  padding: $space-xl $space-xxl;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &__logo {
+    width: 60px;
+    margin-bottom: $space-lg;
+    display: block;
+  }
+
+  &__header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: $space-sm;
+    color: $primary-color;
+  }
+
+  &__subtitle {
+    font-size: $font-size-base;
+    color: $text-light;
+    margin-bottom: $space-xxl;
+  }
+
+  .form-group {
+    margin-bottom: $space-lg;
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $text-color;
+      display: block;
+      margin-bottom: $space-sm;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px $space-md;
+      border-radius: $radius-sm;
+      border: 1px solid #e0e0e0;
+      transition: all 0.2s ease-in-out;
+      font-size: $font-size-base;
+
+      &:focus {
+        border-color: $primary-color;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+      }
+      &.ng-invalid.ng-touched {
+        border-color: $error-color;
+      }
+    }
+  }
+
+  &__utility {
+    text-align: right;
+    margin-top: -$space-sm;
+    margin-bottom: $space-md;
+  }
+
+  &__forgot-link {
+    font-size: 0.9rem;
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+
+    &--primary {
+      background: $primary-color;
+      color: $white;
+
+      &:disabled {
+        background: $disabled-color;
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+
+      &:hover:not(:disabled) {
+        background: darken($primary-color, 8%);
+      }
+    }
+  }
+
+  &__register {
+    margin-top: $space-xl;
+    text-align: center;
+    p {
+      display: inline;
+      font-size: 0.9rem;
+      color: $text-light;
+      margin-right: $space-xs;
+    }
+  }
+
+  &__register-link {
+    color: $primary-color;
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.login-visual {
+  width: 50%;
+  background: $primary-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $space-xl;
+  position: relative;
+
+  &__wrapper {
+    width: 90%;
+    background: $white;
+    padding: $space-xl;
+    border-radius: $radius-md;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+  }
+
+  &__image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+@media (max-width: $breakpoint-tablet) {
+  .login-card {
+    flex-direction: column;
+    width: 98%;
+    max-width: 400px;
+    height: auto;
+  }
+
+  .login-form {
+    width: 100%;
+    padding: $space-lg;
+
+    &__header h2 {
+      font-size: 1.8rem;
+    }
+  }
+
+  .login-visual {
+    width: 100%;
+    padding: $space-lg;
+    border-radius: 0 0 $radius-lg $radius-lg;
+
+    &__wrapper {
+      width: 80%;
+      padding: $space-md;
+    }
+  }
+}
