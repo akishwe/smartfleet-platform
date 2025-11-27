@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { API_BASE_URL } from '../../../../core/constants';
 interface LoginRequest {
@@ -32,7 +33,8 @@ export class LoginComponent {
 
   constructor(
     private readonly fb: FormBuilder,
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private readonly router: Router
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -57,6 +59,7 @@ export class LoginComponent {
       })
       .subscribe({
         next: (res: LoginResponse) => {
+          this.router.navigate(['/dashboard']);
           console.log('Login successful:', res);
           this.loading = false;
         },

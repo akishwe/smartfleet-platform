@@ -61,7 +61,6 @@ export const loginUser = async (req, res) => {
 
     res.setHeader("Set-Cookie", cookie);
 
-    logger.info(`User logged in: ${email}`);
     return successResponse(res, "Login successful", { accessToken }, 200);
   } catch (error) {
     logger.error("Login failed", error);
