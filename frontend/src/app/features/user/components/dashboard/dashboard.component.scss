@@ -1,4 +1,4 @@
-@import "_variables.scss";
+@use "_variables" as *;
 
 .dashboard-container {
   display: flex;
