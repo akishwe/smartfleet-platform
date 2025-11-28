@@ -1,0 +1,109 @@
+@import "_variables.scss";
+
+.base-wrapper {
+  min-height: 100vh;
+  display: flex;
+  font-family: $font-stack;
+
+  .sidebar {
+    width: 220px;
+    background: $primary-color;
+    color: $white;
+    display: flex;
+    flex-direction: column;
+    padding: $space-lg;
+
+    .sidebar-logo {
+      margin-bottom: $space-xl;
+      img {
+        width: 140px;
+      }
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+
+      a {
+        padding: $space-sm $space-md;
+        margin-bottom: $space-sm;
+        color: $white;
+        text-decoration: none;
+        border-radius: $radius-sm;
+
+        &.active,
+        &:hover {
+          background: darken($primary-color, 5%);
+        }
+      }
+    }
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: $bg-color;
+
+    .main-header {
+      padding: $space-md $space-lg;
+      background: $white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+      border-bottom-left-radius: $radius-sm;
+      border-bottom-right-radius: $radius-sm;
+
+      .page-title {
+        font-size: 1.5rem;
+        color: $primary-color;
+      }
+
+      .user-info {
+        font-size: 0.9rem;
+        color: $text-light;
+      }
+    }
+
+    .page-content {
+      flex: 1;
+      padding: $space-lg;
+    }
+
+    .main-footer {
+      padding: $space-md;
+      background: $white;
+      font-size: 0.8rem;
+      color: $text-light;
+      box-shadow: 0px -2px 8px rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+// Responsive
+@media (max-width: $breakpoint-tablet) {
+  .base-wrapper {
+    flex-direction: column;
+
+    .sidebar {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-around;
+      padding: $space-sm;
+      .sidebar-nav {
+        flex-direction: row;
+        a {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .main-content {
+      .main-header {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  }
+}

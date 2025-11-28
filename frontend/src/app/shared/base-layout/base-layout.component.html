@@ -1,0 +1,36 @@
+<div class="base-wrapper flex">
+  <!-- Sidebar -->
+  <aside class="sidebar flex flex--column">
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="SmartFleet Logo" />
+    </div>
+    <nav class="sidebar-nav flex flex--column">
+      <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      <a routerLink="/settings" routerLinkActive="active">Settings</a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main-content flex flex--column">
+    <!-- Header -->
+    <header class="main-header flex flex--space-between">
+      <h1 class="page-title">
+        <ng-content select="[page-title]"></ng-content>
+      </h1>
+      <div class="user-info">
+        Welcome, <strong>{{ userName }}</strong>
+      </div>
+    </header>
+
+    <!-- Page content -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer text-center">
+      &copy; {{ currentYear }} SmartFleet. All rights reserved.
+    </footer>
+  </div>
+</div>

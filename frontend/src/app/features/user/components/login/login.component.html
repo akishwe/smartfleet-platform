@@ -11,7 +11,7 @@
         [formGroup]="loginForm"
         (ngSubmit)="onSubmit()"
         class="login-form__body"
-      >
+        >
         <div class="form-group">
           <label for="email">Email</label>
           <input
@@ -20,52 +20,53 @@
             formControlName="email"
             placeholder="Enter your email"
             aria-required="true"
-          />
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              placeholder="Enter your password"
+              aria-required="true"
+              />
+            </div>
+
+            @if (errorMessage) {
+              <div
+                class="error-message"
+                style="color: #d9534f; margin-bottom: 1rem"
+                >
+                {{ errorMessage }}
+              </div>
+            }
+
+            <button type="submit" [disabled]="loading" class="btn btn--primary">
+              {{ loading ? "Logging in..." : "Login" }}
+            </button>
+          </form>
+
+          <div class="login-form__register">
+            <p>Don't have an account?</p>
+            <a
+              class="btn btn--primary login-form__register-link"
+              routerLink="/register"
+              >
+              Register
+            </a>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            formControlName="password"
-            placeholder="Enter your password"
-            aria-required="true"
-          />
+        <div class="login-visual">
+          <div class="login-visual__wrapper">
+            <img
+              src="/login-bg.png"
+              alt="Logistics and Data Illustration"
+              class="login-visual__image"
+              />
+            </div>
+          </div>
         </div>
-
-        <div
-          *ngIf="errorMessage"
-          class="error-message"
-          style="color: #d9534f; margin-bottom: 1rem"
-        >
-          {{ errorMessage }}
-        </div>
-
-        <button type="submit" [disabled]="loading" class="btn btn--primary">
-          {{ loading ? "Logging in..." : "Login" }}
-        </button>
-      </form>
-
-      <div class="login-form__register">
-        <p>Don't have an account?</p>
-        <a
-          class="btn btn--primary login-form__register-link"
-          routerLink="/register"
-        >
-          Register
-        </a>
       </div>
-    </div>
-
-    <div class="login-visual">
-      <div class="login-visual__wrapper">
-        <img
-          src="/login-bg.png"
-          alt="Logistics and Data Illustration"
-          class="login-visual__image"
-        />
-      </div>
-    </div>
-  </div>
-</div>
