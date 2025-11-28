@@ -1,0 +1,157 @@
+@import "_variables.scss";
+
+.dashboard-container {
+  display: flex;
+  background: $bg-color;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px;
+  background: $primary-color;
+  color: $white;
+  padding: $space-lg;
+  display: flex;
+  flex-direction: column;
+
+  &__logo {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: $space-xl;
+  }
+
+  &__menu {
+    list-style: none;
+    padding: 0;
+
+    li {
+      padding: 12px;
+      margin-bottom: 6px;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      transition: 0.2s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &.active {
+        background: rgba(255, 255, 255, 0.2);
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  padding: $space-xl;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $space-xl;
+
+  &__profile {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    .profile-img {
+      width: 40px;
+      border-radius: 50%;
+    }
+
+    .notif {
+      background: #e74c3c;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 50%;
+      font-size: 12px;
+    }
+  }
+}
+
+/* STATS CARDS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-lg;
+
+  .stat-card {
+    background: $white;
+    padding: $space-lg;
+    border-radius: $radius-md;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    h3 {
+      color: $primary-color;
+      font-size: 28px;
+      margin: 5px 0;
+    }
+
+    .positive {
+      color: green;
+    }
+    .negative {
+      color: red;
+    }
+    .warning {
+      color: orange;
+    }
+    .danger {
+      color: #e74c3c;
+    }
+  }
+}
+
+/* CHART CARDS */
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-lg;
+  margin-top: $space-xl;
+
+  .chart-card {
+    background: $white;
+    padding: $space-lg;
+    border-radius: $radius-md;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    canvas {
+      margin-top: $space-md;
+    }
+  }
+}
+
+/* TABLES */
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-lg;
+  margin-top: $space-xl;
+
+  .table-card {
+    background: $white;
+    padding: $space-lg;
+    border-radius: $radius-md;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  }
+}

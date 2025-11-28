@@ -1,1 +1,81 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <!-- ======================= -->
+  <!--        HEADER           -->
+  <!-- ======================= -->
+  <div class="dashboard-header">
+    <h2>Dashboard</h2>
+    <p>Welcome back! Here's a quick overview of your activity.</p>
+  </div>
+
+  <!-- ======================= -->
+  <!--       KPI CARDS         -->
+  <!-- ======================= -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <h3>1,245</h3>
+      <p>Total Events</p>
+    </div>
+
+    <div class="kpi-card">
+      <h3>3,487</h3>
+      <p>Active Users</p>
+    </div>
+
+    <div class="kpi-card">
+      <h3>12,430</h3>
+      <p>Combined Searches</p>
+    </div>
+
+    <div class="kpi-card">
+      <h3>78%</h3>
+      <p>Total Completion</p>
+    </div>
+  </div>
+
+  <!-- ======================= -->
+  <!--      CHART SECTION      -->
+  <!-- ======================= -->
+  <div class="charts-section">
+    <!-- PIE CHART -->
+    <div class="chart-card">
+      <h4>Active vs Inactive</h4>
+      <div class="chart-box">
+        <canvas
+          baseChart
+          [data]="pieChartData"
+          [options]="pieChartOptions"
+          chartType="pie"
+        >
+        </canvas>
+      </div>
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="chart-card">
+      <h4>Monthly Usage</h4>
+      <div class="chart-box">
+        <canvas
+          baseChart
+          [data]="barChartData"
+          [options]="barChartOptions"
+          chartType="bar"
+        >
+        </canvas>
+      </div>
+    </div>
+
+    <!-- LINE CHART -->
+    <div class="chart-card">
+      <h4>Yearly Growth</h4>
+      <div class="chart-box">
+        <canvas
+          baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          chartType="line"
+        >
+        </canvas>
+      </div>
+    </div>
+  </div>
+</div>
